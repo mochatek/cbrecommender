@@ -91,7 +91,7 @@ print(gen)
 ```python
 rating = [8.5,7.8,7.8,8.5]
 model = r.fit(gen.iloc[:4, :], rating)
-print(c.user_profile)
+print(r.user_profile)
 ```
 | action | adventure | drama | fantasy | romance | sci-fi |
 -------|-------|--------|---------|------|------|
