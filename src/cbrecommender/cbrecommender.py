@@ -13,7 +13,12 @@ class CBRecommender:
 
     def __init__(self):
         """ Constructs all the necessary attributes for the recommender object. """
-        self.user_profile = None
+        self.__user_profile = None
+
+    @property
+    def user_profile(self) -> DataFrame:
+        """ Getter for user_profile """
+        return self.__user_profile
 
     @ensure_type([DataFrame], instance_method=True)
     def encode_features(self, features: DataFrame) -> DataFrame:
@@ -28,8 +33,8 @@ class CBRecommender:
             `encoded_features` (DataFrame): One-Hot-Encoded form of the features
         """
 
-        encoded_features = concat([features[feature_name].apply(
-            remove_spaces).str.get_dummies(sep=',') for feature_name in features], axis=1)
+        encoded_features = concat((features[feature_name].apply(
+            remove_spaces).str.get_dummies(sep=',') for feature_name in features), axis=1)
 
         return encoded_features
 
@@ -58,7 +63,7 @@ class CBRecommender:
         profile_matrix = score_matrix.dot(feature_matrix)
         normalized_profile_matrix = profile_matrix / profile_matrix.sum()
 
-        self.user_profile = DataFrame(
+        self.__user_profile = DataFrame(
             normalized_profile_matrix, columns=train_features.columns)
         return self.user_profile
 
