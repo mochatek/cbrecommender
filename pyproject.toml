@@ -1,0 +1,25 @@
+[build-system]
+requires = [
+    "setuptools>=42",
+    "wheel"
+]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "cbrecommender"
+version = "1.0.0"
+authors = [
+  { name="Akash S Panickar", email="akashsabu@ymail.com" },
+]
+description = "A library for implementing Content-Based Recommendation Engines with ease!"
+readme = "README.md"
+license = { file="LICENSE" }
+requires-python = ">=3.7"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+
+[project.urls]
+"Homepage" = "https://github.com/mochatek/cbrecommender"
