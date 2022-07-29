@@ -27,20 +27,20 @@ recommender = CBRecommender()
 **2. One Hot Encoding the features :**
 
 ```python
-encoded_features = recommender.oneHotEncode(features)
+encoded_features = recommender.encode_features(features)
 ```
 
-- `features` must be _pandas.DataFrame_ that signifies the user's preferences. Example: movie genres, news topics, post tags etc.
+- `features` must be _DataFrame_ that signifies the user's preferences. Example: movie genres, news topics, post tags etc.
 
-- `oneHotEncode()` will return a OneHot-Encoded dataframe created from the supplied features.
+- `encoded_features()` will return a OneHot-Encoded dataframe created from the supplied features.
 
 **3. Extracting user preferences and creating _User-Profile_ :**
 
 ```python
-model = recommender.fit(train_features, train_scores)
+user_profile = recommender.fit(train_features, scores)
 ```
 
-- `fit()` is where we train our model and construct the user-profile.
+- `fit()` is where we train our recommendation model and construct the user-profile.
 
 - `train_features` must be a sample from encoded_features. Example: OneHot-Encoded genres of watched movies.
 
@@ -64,18 +64,18 @@ recommendations = recommender.recommend(test_items, test_features, threshold_sco
 
 ```python
 from cbrecommender import CBRecommender
-import pandas
+from pandas import DataFrame
 ```
 
 ```python
-df = pandas.DataFrame(
+data = DataFrame(
 {'movie':['Endgame','Avatar','Titanic','Infinity War','Jurassic World','Black Panther',
           'Harry Potter-II','The Last Jedi'],
  'genre':['Action,Adventure,Drama','Action,Adventure,Fantasy','Drama,Romance',
           'Action,Adventure,Sci-Fi','Action,Adventure,Sci-Fi','Action,Adventure,Sci-Fi',
           'Adventure,Drama,Fantasy','Action,Adventure,Fantasy']
 })
-print(df)
+print(data)
 ```
 
 | movie           | genre                    |
@@ -92,8 +92,8 @@ print(df)
 ```python
 recommender = CBRecommender()
 
-# We are considering genre alone as the feature
-onehot_encoded_genres = recommender.encode_features(df.genre)
+# We are considering genre alone as the feature. You can include other features as well.
+onehot_encoded_genres = recommender.encode_features(data[['genre']])
 print(onehot_encoded_genres)
 ```
 
@@ -109,10 +109,12 @@ print(onehot_encoded_genres)
 | 1      | 1         | 0     | 1       | 0       | 0      |
 
 ```python
+# Consider we had watched the first 4 movies. So we use it as training data to extract preferences.
+# We use the user rating for the watched movies as the preference score.
 watched_movie_genres = onehot_encoded_genres.iloc[:4, :]
-watched_movie_rating = [8.5,7.8,7.8,8.5]
+watched_movie_ratings = [8.5,7.8,7.8,8.5]
 
-model = recommender.fit(watched_movie_genres, watched_movie_rating)
+user_profile = recommender.fit(watched_movie_genres, watched_movie_ratings)
 print(recommender.user_profile)
 ```
 
@@ -121,20 +123,20 @@ print(recommender.user_profile)
 | 0.2755 | 0.2755    | 0.1811 | 0.0866  | 0.0866  | 0.0944 |
 
 ```python
-unwatched_movies = df[['movie']].iloc[4:,:]
+# We use the remaining 4 unwatched movies as test data to get recommendations from.
+unwatched_movies = data[['movie']].iloc[4:,:]
 unwatched_movie_genres = onehot_encoded_genres.iloc[4:,:]
 
-# Recommend top 4 movies with an expected score >= 5
-recommendations = recommender.recommend(unwatched_movies, unwatched_movie_genres, 5, 4)
+# Recommend top 3 movies with minimum expected rating of 5.0
+recommendations = recommender.recommend(unwatched_movies, unwatched_movie_genres, 5.0, 3)
 print(recommendations)
 ```
 
-| item            | expected score |
-| --------------- | -------------- |
-| Jurassic World  | 6.45           |
-| Black Panther   | 6.45           |
-| Harry Potter-II | 6.37           |
-| The Last Jedi   | 5.43           |
+| item           | expected score |
+| -------------- | -------------- |
+| Jurassic World | 6.45           |
+| Black Panther  | 6.45           |
+| The Last Jedi  | 6.37           |
 
 ## Contributing
 

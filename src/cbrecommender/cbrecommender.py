@@ -34,32 +34,32 @@ class CBRecommender:
         return encoded_features
 
     @ensure_type([DataFrame, list], instance_method=True)
-    def fit(self, training_features: DataFrame, scores: list) -> DataFrame:
+    def fit(self, train_features: DataFrame, scores: list) -> DataFrame:
         """
-        Builds the user_profile by extracting user's preference from the training_features and scores.
+        Builds the user_profile by extracting user's preference from the train_features and scores.
 
         Args:
-            `training_features` (DataFrame): Features for training the model. It should be One-Hot-Encoded.
+            `train_features` (DataFrame): Features for training the model. It should be One-Hot-Encoded.
                 Example: Genres of watched movies
 
-            `scores` (float): Score associated to each item in training_features
+            `scores` (float): Score associated to each item in train_features
                 Example: User rating for each watched movie
 
         Returns:
             `user_profile` (DataFrame): The preference model built for the user, which will be used for recommending.
         """
 
-        if len(training_features.index) != len(scores):
+        if len(train_features.index) != len(scores):
             raise ValueError(
-                f'training_features and scores should be equal in length, got {len(training_features.index)} and {len(scores)} instead.')
+                f'train_features and scores should be equal in length, got {len(train_features.index)} and {len(scores)} instead.')
 
-        feature_matrix = training_features.values
+        feature_matrix = train_features.values
         score_matrix = array(scores, ndmin=2)
         profile_matrix = score_matrix.dot(feature_matrix)
         normalized_profile_matrix = profile_matrix / profile_matrix.sum()
 
         self.user_profile = DataFrame(
-            normalized_profile_matrix, columns=training_features.columns)
+            normalized_profile_matrix, columns=train_features.columns)
         return self.user_profile
 
     @ensure_type([DataFrame, DataFrame, float, int], instance_method=True)
