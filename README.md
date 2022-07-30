@@ -68,9 +68,9 @@ recommendations = recommender.recommend(test_items, test_item_profiles, min_scor
 
 - `test_item_profiles: DataFrame` must be the item-profiles of _test_items_.
 
-- `min_score` must be a numerical value (1-10) that specifies the minimum score for recommending items. Default is 7.5.
+- `min_score: float` must be a numerical value (1-10) that specifies the minimum score for recommending items. Default is 7.5.
 
-- `limit` must be an integer that denotes the number of items to recommended.
+- `limit: int` must be an integer that denotes the number of items to recommended.
 
 ## Example
 
