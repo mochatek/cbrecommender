@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "cbrecommender"
-version = "1.0.1"
+version = "1.1.1"
 description = "A library for implementing Content-Based Recommendation Engines with ease!"
 readme = "README.md"
 authors = [{ name = "Akash S Panickar", email = "akashsabu@ymail.com" }]
