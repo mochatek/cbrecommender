@@ -6,6 +6,16 @@
 
 cbrecommender is a Python library for implementing Content-Based Recommendation Engines with ease!
 
+**A Content-Based Recommender** is a form of **Personalized recommendation System** that maintains a user profile and tries to match the items with the taste profile of a user before presenting them as a recommendation to the user.
+
+`The key ideas are:`
+
+> - Model items according to relevant attributes derived from the content.
+
+> - Develop a user profile either from their implicit actions (clicks, time spend on a video etc.), explicit actions(purchase, rating etc.) or by combining both.
+
+> - Use these profiles to provide recommendations.
+
 ## Installation
 
 Install from pypi with `pip` :
@@ -24,39 +34,41 @@ from cbrecommender import CBRecommender
 recommender = CBRecommender()
 ```
 
-**2. One Hot Encoding the features :**
+**2. Creating _Item Profiles_ :**
+
+In Content-Based Recommender, we must build a profile for each item, which will represent the important characteristics of that item.
 
 ```python
-encoded_features = recommender.encode_features(features)
+item_profiles = recommender.create_item_profile(features)
 ```
 
-- `features` must be _DataFrame_ that signifies the user's preferences. Example: movie genres, news topics, post tags etc.
+- `features: DataFrame` must be relevant attributes of the item that signifies the user's preferences. For example: movie genres, news topics, post tags etc.
 
-- `encoded_features()` will return a OneHot-Encoded dataframe created from the supplied features.
+- `create_item_profile() -> DataFrame` will return the item_profiles created from the supplied features.
 
-**3. Extracting user preferences and creating _User-Profile_ :**
+**3. Creating _User Profile_ :**
 
 ```python
-user_profile = recommender.fit(train_features, scores)
+user_profile = recommender.fit(train_item_profiles, scores)
 ```
 
-- `fit()` is where we train our recommendation model and construct the user-profile.
+- `fit() -> DataFrame` is where we extract user preferences from the item-profiles and associated scores, and then construct the user-profile.
 
-- `train_features` must be a sample from encoded_features. Example: OneHot-Encoded genres of watched movies.
+- `train_item_profiles: DataFrame` must be a subset of the item-profiles created at _step 2_. For example, it can be the item-profiles of the movies already watched by the user (watch history).
 
-- `scores` must be an array denoting the user's preference (as measure) corresponding to each item of the selected sample. Example: Rating for a movie, song etc.
+- `scores: List[float]` must be a list of some measure corresponding to each item in _train_item_profiles_, denoting how much the user liked that item. For example: Rating for a watched movie, song etc.
 
-**4. Get recommendations based on User-Profile :**
+**4. Get recommendations based on _User Profile_ :**
 
 ```python
-recommendations = recommender.recommend(test_items, test_features, threshold_score, limit)
+recommendations = recommender.recommend(test_items, test_item_profiles, min_score, limit)
 ```
 
-- `test_items` must be a _pandas.DataFrame_ which denote those items that the user have not used for training. Example: Unwatched movies.
+- `test_items: DataFrame` must be those items that the user have not used for training and from which we need recommendations. For example: Unwatched movies.
 
-- `test_features` must be the OneHot-Encoded _pandas.DataFrame_ of the features of the test_items.
+- `test_item_profiles: DataFrame` must be the item-profiles of _test_items_.
 
-- `threshold_score` must be numerical value (1-10) that specifies the threshold score for recommending items. Default is 7.5.
+- `min_score` must be a numerical value (1-10) that specifies the minimum score for recommending items. Default is 7.5.
 
 - `limit` must be an integer that denotes the number of items to recommended.
 
@@ -93,8 +105,8 @@ print(data)
 recommender = CBRecommender()
 
 # We are considering genre alone as the feature. You can include other features as well.
-onehot_encoded_genres = recommender.encode_features(data[['genre']])
-print(onehot_encoded_genres)
+movie_profiles = recommender.create_item_profile(data[['genre']])
+print(movie_profiles)
 ```
 
 | action | adventure | drama | fantasy | romance | sci-fi |
@@ -111,10 +123,10 @@ print(onehot_encoded_genres)
 ```python
 # Consider we had watched the first 4 movies. So we use it as training data to extract preferences.
 # We use the user rating for the watched movies as the preference score.
-watched_movie_genres = onehot_encoded_genres.iloc[:4, :]
+watched_movie_profiles = movie_profiles.iloc[:4, :]
 watched_movie_ratings = [8.5,7.8,7.8,8.5]
 
-user_profile = recommender.fit(watched_movie_genres, watched_movie_ratings)
+user_profile = recommender.fit(watched_movie_profiles, watched_movie_ratings)
 print(recommender.user_profile)
 ```
 
@@ -125,10 +137,10 @@ print(recommender.user_profile)
 ```python
 # We use the remaining 4 unwatched movies as test data to get recommendations from.
 unwatched_movies = data[['movie']].iloc[4:,:]
-unwatched_movie_genres = onehot_encoded_genres.iloc[4:,:]
+unwatched_movie_profiles = movie_profiles.iloc[4:,:]
 
 # Recommend top 3 movies with minimum expected rating of 5.0
-recommendations = recommender.recommend(unwatched_movies, unwatched_movie_genres, 5.0, 3)
+recommendations = recommender.recommend(unwatched_movies, unwatched_movie_profiles, 5.0, 3)
 print(recommendations)
 ```
 
